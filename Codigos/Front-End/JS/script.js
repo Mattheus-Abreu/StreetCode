@@ -2,21 +2,59 @@ let index = 0
 let cartItens = []
 const image = document.querySelectorAll('.img-carousel')
 
-document.addEventListener('DOMContentLoaded', () => {
-    fetch('http://localhost:3000/products')
-      .then(response => response.json())
-      .then(data => {
-        const container = document.getElementById('products-container');
-        data.forEach(product => {
-          const card = createCard(product);
-          container.appendChild(card);
-        });
-      })
-      .catch(error => console.error('Erro ao carregar produtos:', error));
-  });
+document.addEventListener("DOMContentLoaded", () => {
+    buscarProdutos();
+});
+
+async function buscarProdutos() {
+    try {
+        const response = await fetch('http://localhost:3000/products'); // URL do servidor
+        if (!response.ok) {
+            throw new Error(`Erro ao buscar produtos: ${response.statusText}`);
+        }
+
+        const produtos = await response.json();
+        console.log("Produtos recebidos do servidor:", produtos);
+
+        mostrarProdutos(produtos);
+    } catch (error) {
+        console.error("Erro ao buscar os produtos:", error);
+        alert("Não foi possível carregar os produtos. Tente novamente mais tarde.");
+    }
+}
+
+function mostrarProdutos(produtos) {
+    const todosProdutosDiv = document.querySelector(".products-container"); // Certifique-se de que existe essa classe no HTML
+    if (!todosProdutosDiv) {
+        console.error("Contêiner de produtos não encontrado! Verifique se a classe '.produtos-container' existe no HTML.");
+        return;
+    }
+
+    todosProdutosDiv.innerHTML = ""; // Limpa o conteúdo antes de adicionar novos cards
+
+    for (let produto of produtos) {
+        console.log(produto.nome); // Exibe o nome do produto no console
+
+        const produtoDiv = document.createElement("div");
+        produtoDiv.classList.add("cardProduct");
+
+        produtoDiv.innerHTML = `
+            <img width="200" src="${produto.imagem_url}" alt="${produto.nome}" />
+            <div class="infoProduct">
+                <h3>${produto.nome}</h3>
+                <p>Preço: R$ ${produto.preco}</p>
+            </div>
+        `;
+
+        todosProdutosDiv.appendChild(produtoDiv);
+    }
+}
+
+
+
+
+
   
-
-
   
 
 
