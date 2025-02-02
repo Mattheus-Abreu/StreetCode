@@ -3,40 +3,73 @@ let cartItens = []
 const image = document.querySelectorAll('.img-carousel')
 
 document.addEventListener("DOMContentLoaded", () => {
-    buscarProdutos();
-});
+    buscarProdutos()
+})
 
 async function buscarProdutos() {
     try {
-        const response = await fetch('http://localhost:3000/products'); // URL do servidor
+        const response = await fetch('http://localhost:3000/products')
         if (!response.ok) {
-            throw new Error(`Erro ao buscar produtos: ${response.statusText}`);
+            throw new Error(`Erro ao buscar produtos: ${response.statusText}`)
         }
 
-        const produtos = await response.json();
-        console.log("Produtos recebidos do servidor:", produtos);
+        const produtos = await response.json()
+        console.log("Produtos recebidos do servidor:", produtos)
 
         mostrarProdutos(produtos);
     } catch (error) {
-        console.error("Erro ao buscar os produtos:", error);
-        alert("Não foi possível carregar os produtos. Tente novamente mais tarde.");
+        console.error("Erro ao buscar os produtos:", error)
+        alert("Não foi possível carregar os produtos. Tente novamente mais tarde.")
     }
 }
 
 function mostrarProdutos(produtos) {
-    const todosProdutosDiv = document.querySelector(".products-container"); // Certifique-se de que existe essa classe no HTML
-    if (!todosProdutosDiv) {
-        console.error("Contêiner de produtos não encontrado! Verifique se a classe '.produtos-container' existe no HTML.");
-        return;
+    const todosProdutosDiv = document.querySelector(".products-container")
+    if (!todosProdutosDiv) return
+
+    todosProdutosDiv.innerHTML = ""
+
+    const modal = document.querySelector(".modalRequest")
+    const botaoFechar = document.querySelector(".closeButton button")
+    const modalImagem = document.querySelector(".modalImageShirt")
+    const modalNome = document.querySelector(".modalInfoShirt h1")
+    const modalPreco = document.querySelector(".modalInfoShirt .shirtValue h3")
+    const botoesTamanho = document.querySelectorAll(".shirtSizes button")
+    const botaoAdicionarCarrinho = document.querySelector("#add-carrinho")
+    const cartContainer = document.getElementById("cartItens")
+    const totalValue = document.getElementById("total")
+
+    let tamanhoSelecionado = "P"
+    let total = 0
+
+
+    function selecionarTamanho(botaoSelecionado) {
+        botoesTamanho.forEach((botao) => (botao.style.border = "none"))
+        botaoSelecionado.style.border = "1px solid black"
+        tamanhoSelecionado = botaoSelecionado.textContent
     }
 
-    todosProdutosDiv.innerHTML = ""; // Limpa o conteúdo antes de adicionar novos cards
+    function adicionarAoCarrinho(nome, imagem, preco, tamanho) {
+        const precoNumerico = parseFloat(preco.replace("R$", "").replace(",", "."))
+        total += precoNumerico
+
+        const itemDiv = document.createElement("div")
+        itemDiv.classList.add("itemEscolhido")
+
+        itemDiv.innerHTML = `
+            <h3>${nome}</h3>
+            <p>Tamanho: <b>${tamanho}</b></p>
+            <p>R$ ${preco}</p>
+        `
+
+        cartContainer.appendChild(itemDiv)
+
+        totalValue.textContent = `R$ ${total.toFixed(2).replace(".", ",")}`
+    }
 
     for (let produto of produtos) {
-        console.log(produto.nome); // Exibe o nome do produto no console
-
-        const produtoDiv = document.createElement("div");
-        produtoDiv.classList.add("cardProduct");
+        const produtoDiv = document.createElement("div")
+        produtoDiv.classList.add("cardProduct")
 
         produtoDiv.innerHTML = `
             <img width="200" src="${produto.imagem_url}" alt="${produto.nome}" />
@@ -44,19 +77,37 @@ function mostrarProdutos(produtos) {
                 <h3>${produto.nome}</h3>
                 <p>Preço: R$ ${produto.preco}</p>
             </div>
-        `;
+        `
 
-        todosProdutosDiv.appendChild(produtoDiv);
+        produtoDiv.onclick = () => {
+            modal.style.display = "flex"
+            modalImagem.style.backgroundImage = `url(${produto.imagem_url})`
+            modalNome.textContent = produto.nome
+            modalPreco.textContent = `R$ ${produto.preco}`
+            selecionarTamanho(botoesTamanho[0])
+        };
+
+        todosProdutosDiv.appendChild(produtoDiv)
     }
+
+    botoesTamanho.forEach((botao) => {
+        botao.onclick = () => selecionarTamanho(botao)
+    });
+
+    botaoAdicionarCarrinho.onclick = () => {
+        const nome = modalNome.textContent;
+        const imagem = modalImagem.style.backgroundImage.replace('url("', '').replace('")', '')
+        const preco = modalPreco.textContent
+        const tamanho = tamanhoSelecionado
+
+        adicionarAoCarrinho(nome, imagem, preco, tamanho)
+
+        alert("Produto adicionado ao carrinho")
+        modal.style.display = "none"
+    };
+
+    botaoFechar.onclick = () => (modal.style.display = "none")
 }
-
-
-
-
-
-  
-  
-
 
 
 function featuredImage(index) {
@@ -66,46 +117,15 @@ function featuredImage(index) {
             img.classList.add('active')
         }
     })
-
 }
 
 function nextImage(){
     index = (index + 1) % image.length
     featuredImage(index)
 }
-
 setInterval(nextImage, 3000)
-
 featuredImage(index)
 
-
-function openModal(name, image, size){
-    const modal = document.getElementById('productModal')
-    document.getElementById('productTitle').textContent = name
-    document.getElementById('modalImage').src = image
-    const sizesContainer = document.getElementById('productSizes')
-    sizesContainer.innerHTML = ''
-    size.forEach(size => {
-        const button = document.createElement('button')
-        button.textContent = size
-        button.onclick = () => selectedSize = size
-        sizesContainer.appendChild(button)
-    });
-
-    modal.style.display = 'flex'
-}
-
-function closeModal(){
-    document.getElementById('productModal').style.display = 'none'
-}
-
-function selectedSize(size){
-    alert(`Tamanho selecionado: ${size}`)
-}
-
-function addToCart(){
-    alert('Produto adicionado ao carrinho!')
-}
 
 function openCart(){
     document.getElementById('sideBarCart').style.right = '0'
@@ -115,65 +135,58 @@ function closeSideBar(){
     document.getElementById('sideBarCart').style.right = '-100%'
 }
 
-function addToCart(name, value, size){
-    cartItens.push({name, value, size})
-    updateCart()
-}
 
-function updateCart(){
-    const cartContainer = document.getElementById('cartItens')
-    const totalValue = document.getElementById('valueTotal')
-    cartContainer.innerHTML = ''
-
-    let total = 0 
-
-    cartItens.forEach(item => {
-        total += item.value
-        itemDiv.classList.add('cartItens')
-        itemDiv.innerHTML = `
-            <p>${item.itemName} - Tamanho: ${item.sizes.join(', ')}</p>
-            <p>Preço: R$ ${item.itemPrice.toFixed(2)}</p>
-        `
-        totalValue.textContent = `R$ ${total.toFixed(2)}`
-    })
-}
-
-function purchase(){
+function purchase() {
     const cpf = document.getElementById('cpf').value
     const cep = document.getElementById('cep').value
+    const cartContainer = document.getElementById('cartItens')
+    const totalValue = document.getElementById('total')
 
-    if(cpf && cep){
-        alert('Compra realizada com sucesso!')
-        cartItens = []
-        updateCart()
-        closeCart()
-    }else{
+    if (cpf && cep) {
+        const itens = Array.from(cartContainer.querySelectorAll(".itemEscolhido")).map(item => {
+            const nome = item.querySelector("h3").textContent
+            const tamanho = item.querySelector("p b").textContent
+            const preco = item.querySelector("p:nth-child(3)").textContent
+            return { nome, tamanho, preco }
+        })
+
+        const pedidosDetalhes = itens.map(item => 
+            `Nome: ${item.nome}, Tamanho: ${item.tamanho}, Preço: ${item.preco}`
+        ).join("\n")
+
+        const total = totalValue.textContent
+
+        const payload = {
+            cpf,
+            cep,
+            descricao_pedido: pedidosDetalhes,
+            valor_total: total.replace('R$', '').trim().replace(',', '.')
+        }
+
+        console.log('Enviando para o backend:', payload)
+
+        fetch('http://localhost:3000/sales', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Resposta do servidor:', data)
+            if (data.error) throw new Error(data.error)
+            alert('Compra realizada com sucesso!')
+        })
+        .catch(error => {
+            console.error('Erro ao registrar venda:', error.message)
+            alert('Erro ao registrar venda')
+        })
+
+        cartContainer.innerHTML = ""
+        totalValue.textContent = "R$ 0,00"
+        document.getElementById('cpf').value = ""
+        document.getElementById('cep').value = ""
+    } else {
         alert('Preencha os campos necessários!')
     }
 }
 
-function finalizePurchase() {
-    const cpf = document.querySelector('#cpf').value;
-    const cep = document.querySelector('#cep').value;
-    const items = getCartItems();
-    const total = calculateTotal();
-
-    if (!cpf || !cep) {
-        alert('Por favor, insira o CPF e o CEP.');
-        return;
-    }
-
-    fetch('/orders', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ cpf, cep, items, total })
-    })
-    .then(response => response.json())
-    .then(data => {
-        alert(data.message);
-        clearCart();
-    })
-    .catch(error => console.error('Erro ao finalizar compra:', error));
-}

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>StreetCode</title>
     <link rel="stylesheet" href="Codigos/Front-End/CSS/style.css">
+    <link rel="web icon" href="Codigos/Front-End/Asset/icon.png">
 </head>
 <body>
     <div class="header">
@@ -28,24 +29,11 @@
     </div>
 
     <div class="products-container">
-        
         <div class="infoProduct"></div>
     </div>
-   
 
-    <div id="productModal" class="modal">
-        <div class="modalContent">
-            <span class="close" onclick="closeModal()">X</span>
-            <div class="productLeft">
-                <img id="modalImage" src="" alt="produto">
-            </div>
-            <div class="descriptionRight">
-                <h2 id="productTitle">Produto</h2>
-                <div id="productSizes"></div>
-                <button onclick="addToCart()">Adicionar ao carrinho</button>
-            </div>
-        </div>
-    </div>
+
+    <!-- Modal Carrinho -->
 
     <div id="sideBarCart" class="sideBarCart">
         <div class="cartHeader">
@@ -53,7 +41,10 @@
             <h2>Meu Carrinho</h2>
         </div>
         
-        <div id="cartItens"></div>
+        <div id="cartItens" class="cartItens">
+            
+
+        </div>
         <div class="cartSumary">
             <label for="cpf">CPF: </label>
             <input type="text" id="cpf" placeholder="000.000.000-00" required>
@@ -63,14 +54,44 @@
                 <span>Total: </span>
                 <span id="total">R$ 0.00</span>
             </div>
-            <button onclick="purchase()">Efetuar Compra</button>
+            <button class="buttonPurchase" onclick="purchase()">Efetuar Compra</button>
         </div>
-
-
     </div>
 
 
+    <!-- Modal Pedido -->
 
-    <script src="Codigos/Front-End/JS/script.js"></script>
-    </body>
+    <div class="modalRequest">
+        <div class="modalContent">
+            <div class="closeButton">
+                <button>X</button>
+            </div>
+            <div class="modalImageShirt">
+                <!-- Imagem da camisa -->
+            </div>
+            <div class="modalInfoShirt">
+                <p>CAMISA</p>
+                <h1>ADS 2023 Preta</h1>
+
+                <p>Tamanho</p>
+                <div class="shirtSizes">
+                    <button>P</button>
+                    <button>M</button>
+                    <button>G</button>
+                    <button>GG</button>
+                    <button>EG</button>
+                </div>
+
+                <div class="shirtValue">
+                    <p>PREÇO</p>
+                    <h3>129,99</h3>
+                </div>
+
+                <button id="add-carrinho">ADICIONAR AO CARRINHO</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="Codigos/Front-End/JS/script.js"></script>    
+</body>
 </html>

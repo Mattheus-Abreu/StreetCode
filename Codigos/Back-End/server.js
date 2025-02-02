@@ -7,7 +7,7 @@ const pool = new Pool({
   user: 'postgres',
   host: 'localhost',
   database: 'StreetCode_DB',
-  password: '1234',
+  password: '123',
   port: 5432
 })
 
@@ -41,21 +41,30 @@ app.get('/products', async (req, res) => {
 
 })
 
-app.post('/orders', async (req, res) => {
-  const { CPF, CEP, itens, total } = req.body
-
-  if (!CPF || !CEP) {
-    return res.status(400).json({ error: 'Preencha todos os campos!' })
-  }
-
+app.post('/sales', async (req, res) => {
   try {
-    const description = itens.map(item => `${item.name} (${item.size})`).join(', ')
-    const queryText = 'INSERT INTO sales (cpf, cep, descricao, valor_total) VALUES ($1, $2, $3, $4)'
-    await db.query(queryText, [CPF, CEP, description, total])
-    res.status(201).json({ message: 'Pedido realizado com sucesso!' })
-  } catch (err) {
-    console.error(err.message)
-    res.status(500).send('Erro ao criar pedido')
+      console.log('Requisição recebida:', req.body) // Log para verificar os dados recebidos
+      
+      const { cpf, cep, descricao_pedido, valor_total } = req.body
+      if (!cpf || !cep || !descricao_pedido || !valor_total) {
+          return res.status(400).json({ error: 'Dados incompletos' })
+      }
+
+      const data_pedido = new Date()
+      const query = `
+          INSERT INTO vendas (cpf, cep, data_pedido, descricao_pedido, valor_total) 
+          VALUES ($1, $2, $3, $4, $5)
+      `
+      const values = [cpf, cep, data_pedido, descricao_pedido, valor_total]
+
+      console.log('Inserindo no banco:', values) // Log para verificar os dados antes do insert
+
+      await pool.query(query, values)
+
+      res.status(201).json({ message: 'Venda registrada com sucesso' })
+  } catch (error) {
+      console.error('Erro no endpoint /sales:', error) // Log do erro
+      res.status(500).json({ error: 'Erro interno no servidor' })
   }
 })
 
