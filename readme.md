@@ -1,8 +1,12 @@
-# StreetCode</>
+
+
+![alt text](Codigos/Front-End/Asset/StreetCode.png)
 
 ## Visão Geral
 
 O projeto Fullstack StreetCode é um e-commerce de roupas street wear com foco na aréa da tecnologia ou cursos de tecnologia, para que desenvolvedores e amantes da aréa consigam roupas e acessórios que se encaixem com o estilo deles.
+
+![alt text](<Codigos/Front-End/Asset/Pagina Principal.png>)
 
 ## Tecnologias Utilizadas
 - Frontend: HTML, CSS, JavaScript
